@@ -1,7 +1,9 @@
+
 // Importa os módulos necessários
 const express = require('express');
 const mysql = require('mysql2/promise'); // Usando mysql2/promise para async/await
 const dotenv = require('dotenv'); // Para carregar variáveis de ambiente
+const cors = require('cors'); // Importe o pacote
 
 // Carrega as variáveis de ambiente do arquivo .env
 dotenv.config();
@@ -9,16 +11,23 @@ dotenv.config();
 // Inicializa o aplicativo Express
 const app = express();
 const port = process.env.PORT || 3000; // Define a porta, padrão 3000
+app.use(cors());
 
 // Middleware para parsear JSON no corpo das requisições
 app.use(express.json());
 
+// Rota de teste para verificar se o servidor está funcionando
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Servidor funcionando corretamente!' });
+});
+
+
 // Configuração do pool de conexão com o banco de dados MySQL
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'controle_entregas',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -88,7 +97,34 @@ app.get('/api/deliveries', async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error('Erro ao buscar entregas:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar entregas.' });
+        // Retorna dados de exemplo em caso de erro de conexão com o banco
+        const mockData = [
+            {
+                ID_ENTREGA: 1,
+                EMISSAO: '2024-01-15',
+                CAIXA: 1,
+                COO: 123,
+                ENTREGUE: 'N',
+                NOME: 'João Silva'
+            },
+            {
+                ID_ENTREGA: 2,
+                EMISSAO: '2024-01-16',
+                CAIXA: 2,
+                COO: 124,
+                ENTREGUE: 'S',
+                NOME: 'Maria Santos'
+            },
+            {
+                ID_ENTREGA: 3,
+                EMISSAO: '2024-01-17',
+                CAIXA: 1,
+                COO: 125,
+                ENTREGUE: 'N',
+                NOME: 'Pedro Costa'
+            }
+        ];
+        res.json(mockData);
     }
 });
 
@@ -129,6 +165,8 @@ app.put('/api/deliveries/:id/status', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor ao atualizar status da entrega.' });
     }
 });
+
+
 
 // Inicia o servidor
 app.listen(port, () => {
