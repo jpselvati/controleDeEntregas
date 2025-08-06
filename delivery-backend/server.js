@@ -105,7 +105,7 @@ app.get('/api/deliveries', async (req, res) => {
                 CAIXA: 1,
                 COO: 123,
                 ENTREGUE: 'N',
-                NOME: 'João Silva'
+                ENTREGADOR: 'João Silva'
             },
             {
                 ID_ENTREGA: 2,
@@ -113,7 +113,7 @@ app.get('/api/deliveries', async (req, res) => {
                 CAIXA: 2,
                 COO: 124,
                 ENTREGUE: 'S',
-                NOME: 'Maria Santos'
+                ENTREGADOR: 'Maria Santos'
             },
             {
                 ID_ENTREGA: 3,
@@ -121,7 +121,7 @@ app.get('/api/deliveries', async (req, res) => {
                 CAIXA: 1,
                 COO: 125,
                 ENTREGUE: 'N',
-                NOME: 'Pedro Costa'
+                ENTREGADOR: 'Pedro Costa'
             }
         ];
         res.json(mockData);
@@ -151,7 +151,7 @@ app.put('/api/deliveries/:id/status', async (req, res) => {
 
     try {
         const [result] = await pool.execute(
-            'UPDATE entregas SET ENTREGUE = ?, NOME = ? WHERE ID_ENTREGA = ?',
+            'UPDATE entregas SET ENTREGUE = ?, ENTREGADOR = ? WHERE ID_ENTREGA = ?',
             [status.toUpperCase(), delivererName.trim(), id]
         );
 
